@@ -19,8 +19,8 @@ router.get('/', (req, res) => {
 });
 
 router.get('/direction', cacheDirection, getDirection);
-router.get('/abc', cacheAbc, findAandC);
-router.get('/xyz', cacheXyz, findXYZ);
+router.get('/abc', cacheABC, findAandC);
+router.get('/xyz', cacheXYZ, findXYZ);
 
 // Find a and c
 function findAandC(req, res, next) {
@@ -72,6 +72,11 @@ function findXYZ(req, res, next) {
         xyz.y = xyz.five-(1*2);
         xyz.x = xyz.y-(0*2);
 
+        const stringifyData = JSON.stringify(xyz);
+
+        // Set data to Redis
+        client.setex("xyz", 3600, stringifyData);
+
         res.send(xyz);
     } catch (err) {
         console.error(err);
@@ -117,10 +122,10 @@ function cacheDirection(req, res, next) {
     })
 }
 
-function cacheAbc(req, res, next) {
-    const xyz = "xyz";
+function cacheABC(req, res, next) {
+    const a = abc.find(x => x.id === "a").value; 
 
-    client.get(xyz, (err, data) => {
+    client.get(a, (err, data) => {
 
         if (err) throw err;
 
@@ -133,10 +138,9 @@ function cacheAbc(req, res, next) {
     })
 }
 
-function cacheXyz(req, res, next) {
-    const a = abc.find(x => x.id === "a").value; 
-
-    client.get(a, (err, data) => {
+function cacheXYZ(req, res, next) {
+    
+    client.get("xyz", (err, data) => {
 
         if (err) throw err;
 
