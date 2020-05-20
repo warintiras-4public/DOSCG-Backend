@@ -20,13 +20,13 @@ router.get('/', (req, res) => {
 
 router.get('/direction', cacheDirection, getDirection);
 router.get('/abc', cacheAbc, findAandC);
-router.get('/xyz', findXYZ);
+router.get('/xyz', cacheXyz, findXYZ);
 
 // Find a and c
 function findAandC(req, res, next) {
     try {
         console.log("Fetching abc ...");
-  
+
         // a = 21, ab = 23, ac = -21;
         const a = abc.find(x => x.id === "a").value; 
         const ab = abc.find(x => x.id === "ab").value;
@@ -54,7 +54,29 @@ function findAandC(req, res, next) {
 
 // Find x, y, and z
 function findXYZ(req, res, next) {
-    res.send('Under construction...');
+    try {
+        console.log("Fetching xyz ...");
+        
+        // Given X, Y, 5, 9, 15, 23, Z, find the values of X, Y, Z
+        let xyz = { 
+            x: 0,
+            y: 0,
+            five: 5,
+            nine: 9,
+            fifteen: 15,
+            twentythree: 23,
+            z: 0
+        };
+
+        xyz.z = (5*2)+xyz.twentythree; 
+        xyz.y = xyz.five-(1*2);
+        xyz.x = xyz.y-(0*2);
+
+        res.send(xyz);
+    } catch (err) {
+        console.error(err);
+        res.status(500);
+    }
 }
 
 // Google Direction
@@ -96,6 +118,22 @@ function cacheDirection(req, res, next) {
 }
 
 function cacheAbc(req, res, next) {
+    const xyz = "xyz";
+
+    client.get(xyz, (err, data) => {
+
+        if (err) throw err;
+
+        if(data!== null) {
+            res.send(JSON.parse(data));
+        } else {
+            next();
+
+        }
+    })
+}
+
+function cacheXyz(req, res, next) {
     const a = abc.find(x => x.id === "a").value; 
 
     client.get(a, (err, data) => {
